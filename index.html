@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ask Cr. Benedict Ong</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Georgia', serif;
+      background: linear-gradient(135deg, #1a3a5c 0%, #0d2137 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      color: #f0e8d0;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      color: #f5d76e;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      letter-spacing: 1px;
+    }
+
+    header p {
+      font-size: 0.85rem;
+      color: #aac4e0;
+      margin-top: 4px;
+      font-style: italic;
+    }
+
+    .disclaimer {
+      font-size: 0.7rem;
+      color: #7a9bb5;
+      margin-top: 4px;
+    }
+
+    .main-layout {
+      display: flex;
+      gap: 24px;
+      width: 100%;
+      max-width: 1000px;
+      align-items: flex-start;
+    }
+
+    /* ── CARICATURE PANEL ── */
+    .caricature-panel {
+      flex: 0 0 260px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(245,215,110,0.3);
+      border-radius: 16px;
+      padding: 20px 16px;
+      backdrop-filter: blur(4px);
+    }
+
+    .caricature-panel svg {
+      width: 220px;
+      height: 300px;
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+    }
+
+    .name-plate {
+      margin-top: 12px;
+      background: #f5d76e;
+      color: #1a3a5c;
+      padding: 6px 16px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 0.9rem;
+      text-align: center;
+      letter-spacing: 0.5px;
+    }
+
+    .name-plate span {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: normal;
+      margin-top: 2px;
+    }
+
+    .status-badge {
+      margin-top: 8px;
+      font-size: 0.7rem;
+      color: #7fc97f;
+      background: rgba(127,201,127,0.15);
+      border: 1px solid rgba(127,201,127,0.4);
+      border-radius: 20px;
+      padding: 3px 10px;
+    }
+
+    /* ── CHAT PANEL ── */
+    .chat-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .chat-box {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 16px;
+      min-height: 420px;
+      max-height: 420px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      scroll-behavior: smooth;
+    }
+
+    .chat-box::-webkit-scrollbar { width: 6px; }
+    .chat-box::-webkit-scrollbar-track { background: transparent; }
+    .chat-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+
+    .message {
+      display: flex;
+      flex-direction: column;
+      max-width: 90%;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    .message.user { align-self: flex-end; }
+    .message.benedict { align-self: flex-start; }
+
+    .bubble {
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+
+    .message.user .bubble {
+      background: #2a6496;
+      color: #fff;
+      border-bottom-right-radius: 3px;
+    }
+
+    .message.benedict .bubble {
+      background: rgba(245,215,110,0.12);
+      border: 1px solid rgba(245,215,110,0.25);
+      color: #f0e8d0;
+      border-bottom-left-radius: 3px;
+    }
+
+    .msg-label {
+      font-size: 0.68rem;
+      color: #7a9bb5;
+      margin-bottom: 4px;
+      padding: 0 4px;
+    }
+
+    .message.user .msg-label { text-align: right; }
+
+    .typing-indicator {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 10px 14px;
+      background: rgba(245,215,110,0.08);
+      border: 1px solid rgba(245,215,110,0.2);
+      border-radius: 12px;
+      border-bottom-left-radius: 3px;
+      width: fit-content;
+    }
+
+    .dot {
+      width: 7px; height: 7px;
+      background: #f5d76e;
+      border-radius: 50%;
+      animation: bounce 1.2s infinite;
+    }
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+      40% { transform: translateY(-6px); opacity: 1; }
+    }
+
+    @keyframes cursorBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* ── SVG CARICATURE ANIMATIONS ── */
+
+    /* Eyelids: always blink periodically */
+    #eyelidL, #eyelidR {
+      transform-box: fill-box;
+      transform-origin: top center;
+      transform: scaleY(0);
+      animation: eyeBlink 4s ease-in-out infinite;
+    }
+    #eyelidR { animation-delay: 0.06s; }
+
+    @keyframes eyeBlink {
+      0%, 87%, 100% { transform: scaleY(0); }
+      91%, 95%      { transform: scaleY(1); }
+    }
+
+    /* Head: gentle nod while talking */
+    #svgHead {
+      transform-box: fill-box;
+      transform-origin: bottom center;
+    }
+    #benedictSvg.talking #svgHead {
+      animation: headBob 1.4s ease-in-out infinite;
+    }
+    @keyframes headBob {
+      0%   { transform: translateY(0)    rotate(0deg);   }
+      25%  { transform: translateY(-3px) rotate(-1.5deg);}
+      50%  { transform: translateY(0)    rotate(0deg);   }
+      75%  { transform: translateY(2px)  rotate(1deg);   }
+      100% { transform: translateY(0)    rotate(0deg);   }
+    }
+
+    /* Eyebrows: raise slightly while talking */
+    #svgBrows {
+      transform-box: fill-box;
+      transform-origin: bottom center;
+    }
+    #benedictSvg.talking #svgBrows {
+      animation: browRaise 1.4s ease-in-out infinite;
+    }
+    @keyframes browRaise {
+      0%, 100% { transform: translateY(0);    }
+      25%      { transform: translateY(-2px); }
+      75%      { transform: translateY(1px);  }
+    }
+
+    /* Body: sway while talking */
+    #svgBody {
+      transform-box: fill-box;
+      transform-origin: bottom center;
+    }
+    #benedictSvg.talking #svgBody {
+      animation: bodySway 2.1s ease-in-out infinite;
+    }
+    @keyframes bodySway {
+      0%, 100% { transform: rotate(0deg);    }
+      33%      { transform: rotate(-0.8deg); }
+      66%      { transform: rotate(0.6deg);  }
+    }
+
+    /* Tape: rapid horizontal vibration — he's trying to speak through it! */
+    #svgTape { transform-box: fill-box; transform-origin: center center; }
+    #benedictSvg.talking #svgTape {
+      animation: tapeVibrate 0.35s linear infinite;
+    }
+    @keyframes tapeVibrate {
+      0%   { transform: translateX(0);    }
+      15%  { transform: translateX(-2px); }
+      30%  { transform: translateX(2px);  }
+      45%  { transform: translateX(-1.5px);}
+      60%  { transform: translateX(1.5px);}
+      75%  { transform: translateX(-1px); }
+      90%  { transform: translateX(1px);  }
+      100% { transform: translateX(0);    }
+    }
+
+    /* Book: gentle float while talking */
+    #svgBook {
+      transform-box: fill-box;
+      transform-origin: bottom left;
+    }
+    #benedictSvg.talking #svgBook {
+      animation: bookFloat 1.8s ease-in-out infinite;
+    }
+    @keyframes bookFloat {
+      0%, 100% { transform: translateY(0)    rotate(0deg);  }
+      50%      { transform: translateY(-4px) rotate(2deg);  }
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .input-row input {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.07);
+      color: #f0e8d0;
+      font-size: 0.9rem;
+      font-family: 'Georgia', serif;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .input-row input::placeholder { color: #6a8eaa; }
+    .input-row input:focus { border-color: #f5d76e; }
+
+    .input-row button {
+      padding: 12px 22px;
+      background: #f5d76e;
+      color: #1a3a5c;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      font-family: 'Georgia', serif;
+    }
+
+    .input-row button:hover { background: #f9e88a; transform: translateY(-1px); }
+    .input-row button:active { transform: translateY(0); }
+    .input-row button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .suggestion-btn {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #aac4e0;
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Georgia', serif;
+    }
+
+    .suggestion-btn:hover {
+      background: rgba(245,215,110,0.15);
+      border-color: rgba(245,215,110,0.4);
+      color: #f5d76e;
+    }
+
+    @media (max-width: 680px) {
+      .main-layout { flex-direction: column; align-items: center; }
+      .caricature-panel { flex: none; width: 100%; max-width: 320px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Ask Cr. Benedict Ong</h1>
+  <p>Dunedin City Councillor &bull; Former Banker &bull; Man on a Mission</p>
+  <div class="disclaimer">Satire. This is a parody for entertainment purposes only.</div>
+</header>
+
+<div class="main-layout">
+
+  <!-- CARICATURE -->
+  <div class="caricature-panel">
+    <svg id="benedictSvg" viewBox="0 0 220 300" xmlns="http://www.w3.org/2000/svg">
+      <!-- Council chamber background (static) -->
+      <rect x="0" y="200" width="220" height="100" fill="#2c1a0e"/>
+      <rect x="20" y="205" width="180" height="8" fill="#5a3010" rx="2"/>
+
+      <!-- BODY GROUP — sways gently when talking -->
+      <g id="svgBody">
+        <ellipse cx="110" cy="275" rx="70" ry="40" fill="#1c2540"/>
+        <path d="M55 220 Q70 250 80 280 L140 280 Q150 250 165 220 Q140 210 110 208 Q80 210 55 220Z" fill="#1c2540"/>
+        <path d="M98 215 Q110 220 122 215 L116 260 Q110 265 104 260 Z" fill="#e8e8e8"/>
+        <path d="M107 220 L113 220 L116 255 L110 262 L104 255 Z" fill="#c0392b"/>
+        <path d="M109 220 L111 220 L112 228 L108 228 Z" fill="#922b21"/>
+        <path d="M98 215 Q85 225 75 240" stroke="#263050" stroke-width="2" fill="none"/>
+        <path d="M122 215 Q135 225 145 240" stroke="#263050" stroke-width="2" fill="none"/>
+        <rect x="99" y="190" width="22" height="22" rx="6" fill="#e8b88a"/>
+      </g>
+
+      <!-- HEAD GROUP — bobs when talking -->
+      <g id="svgHead">
+        <ellipse cx="110" cy="130" rx="72" ry="80" fill="#e8b88a"/>
+
+        <!-- Hair -->
+        <path d="M38 110 Q40 50 75 42 Q110 36 145 42 Q175 50 182 110 Q160 75 110 74 Q60 75 38 110Z" fill="#1a1a1a"/>
+        <path d="M75 44 Q90 58 95 75" stroke="#2a2a2a" stroke-width="2" fill="none"/>
+
+        <!-- Ears -->
+        <ellipse cx="38" cy="135" rx="10" ry="14" fill="#dba878"/>
+        <ellipse cx="182" cy="135" rx="10" ry="14" fill="#dba878"/>
+        <ellipse cx="38" cy="135" rx="5" ry="8" fill="#c99060"/>
+        <ellipse cx="182" cy="135" rx="5" ry="8" fill="#c99060"/>
+
+        <!-- Eye whites, pupils, highlights -->
+        <ellipse cx="79" cy="124" rx="9" ry="7" fill="white"/>
+        <ellipse cx="141" cy="124" rx="9" ry="7" fill="white"/>
+        <ellipse cx="80" cy="124" rx="5" ry="5" fill="#3a2010"/>
+        <ellipse cx="142" cy="124" rx="5" ry="5" fill="#3a2010"/>
+        <ellipse cx="81" cy="122" rx="2" ry="2" fill="white"/>
+        <ellipse cx="143" cy="122" rx="2" ry="2" fill="white"/>
+
+        <!-- Eyelid overlays — face-coloured, animate shut for blink -->
+        <ellipse id="eyelidL" cx="79" cy="124" rx="9" ry="7" fill="#e8b88a"/>
+        <ellipse id="eyelidR" cx="141" cy="124" rx="9" ry="7" fill="#e8b88a"/>
+
+        <!-- Glasses (rendered above eyelids) -->
+        <rect x="60" y="112" width="38" height="24" rx="8" fill="none" stroke="#2c1a0e" stroke-width="3"/>
+        <rect x="122" y="112" width="38" height="24" rx="8" fill="none" stroke="#2c1a0e" stroke-width="3"/>
+        <line x1="98" y1="124" x2="122" y2="124" stroke="#2c1a0e" stroke-width="2.5"/>
+        <line x1="42" y1="121" x2="60" y2="121" stroke="#2c1a0e" stroke-width="2.5"/>
+        <line x1="160" y1="121" x2="178" y2="121" stroke="#2c1a0e" stroke-width="2.5"/>
+        <rect x="61" y="113" width="36" height="22" rx="7" fill="rgba(150,200,255,0.12)"/>
+        <rect x="123" y="113" width="36" height="22" rx="7" fill="rgba(150,200,255,0.12)"/>
+
+        <!-- Eyebrows -->
+        <g id="svgBrows">
+          <path d="M62 108 Q79 103 96 107" stroke="#2a1a0a" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <path d="M124 107 Q141 103 158 108" stroke="#2a1a0a" stroke-width="3" fill="none" stroke-linecap="round"/>
+        </g>
+
+        <!-- Nose -->
+        <path d="M105 135 Q108 150 105 158 Q110 162 115 158 Q112 150 115 135" fill="#d4a070" stroke="#c08050" stroke-width="0.5"/>
+
+        <!-- TAPE GROUP — vibrates when talking (trying to speak through it!) -->
+        <g id="svgTape">
+          <rect x="72" y="162" width="76" height="22" rx="3" fill="#b8b8b0" stroke="#9a9a92" stroke-width="1"/>
+          <line x1="80" y1="164" x2="80" y2="182" stroke="#a8a8a0" stroke-width="0.5"/>
+          <line x1="88" y1="164" x2="88" y2="182" stroke="#a8a8a0" stroke-width="0.5"/>
+          <line x1="96" y1="164" x2="96" y2="182" stroke="#a8a8a0" stroke-width="0.5"/>
+          <line x1="104" y1="164" x2="104" y2="182" stroke="#a8a8a0" stroke-width="0.5"/>
+          <line x1="112" y1="164" x2="112" y2="182" stroke="#a8a8a0" stroke-width="0.5"/>
+          <line x1="120" y1="164" x2="120" y2="182" stroke="#a8a8a0" stroke-width="0.5"/>
+          <line x1="128" y1="164" x2="128" y2="182" stroke="#a8a8a0" stroke-width="0.5"/>
+          <line x1="136" y1="164" x2="136" y2="182" stroke="#a8a8a0" stroke-width="0.5"/>
+          <line x1="144" y1="164" x2="144" y2="182" stroke="#a8a8a0" stroke-width="0.5"/>
+          <text x="110" y="177" text-anchor="middle" font-size="7" fill="#888880" font-family="sans-serif" font-weight="bold">SILENCED</text>
+        </g>
+
+        <ellipse cx="110" cy="198" rx="28" ry="5" fill="rgba(0,0,0,0.15)"/>
+      </g>
+
+      <!-- BOOK GROUP — floats gently when talking -->
+      <g id="svgBook">
+        <rect x="155" y="235" width="30" height="38" rx="2" fill="#8b2020" transform="rotate(-8,170,254)"/>
+        <rect x="157" y="237" width="26" height="34" rx="1" fill="#a02828" transform="rotate(-8,170,254)"/>
+        <text x="170" y="252" text-anchor="middle" font-size="5.5" fill="#f5d76e" font-family="serif" font-weight="bold" transform="rotate(-8,170,254)">THE</text>
+        <text x="170" y="260" text-anchor="middle" font-size="5.5" fill="#f5d76e" font-family="serif" font-weight="bold" transform="rotate(-8,170,254)">TRIAL</text>
+        <text x="170" y="267" text-anchor="middle" font-size="4" fill="#e0b060" font-family="serif" transform="rotate(-8,170,254)">Kafka</text>
+        <ellipse cx="158" cy="265" rx="12" ry="8" fill="#dba878" transform="rotate(-15,158,265)"/>
+      </g>
+    </svg>
+
+    <div class="name-plate">
+      Cr. Benedict Ong
+      <span>Dunedin City Council</span>
+    </div>
+    <div class="status-badge">● Ready to respond (at length)</div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="chat-panel">
+    <div class="chat-box" id="chatBox"></div>
+
+    <div class="suggestions" id="suggestions">
+      <button class="suggestion-btn" onclick="sendSuggestion(this)">Why did you put tape on your mouth?</button>
+      <button class="suggestion-btn" onclick="sendSuggestion(this)">Tell me about your banking career</button>
+      <button class="suggestion-btn" onclick="sendSuggestion(this)">What are your priorities for Dunedin?</button>
+      <button class="suggestion-btn" onclick="sendSuggestion(this)">Are you eccentric?</button>
+      <button class="suggestion-btn" onclick="sendSuggestion(this)">What do you think about The Trial by Kafka?</button>
+      <button class="suggestion-btn" onclick="sendSuggestion(this)">Are you AI?</button>
+      <button class="suggestion-btn" onclick="sendSuggestion(this)">What happened with the code of conduct?</button>
+    </div>
+
+    <div class="input-row">
+      <input type="text" id="userInput" placeholder="Ask Cr. Ong a question..." onkeydown="if(event.key==='Enter')sendMessage()"/>
+      <button id="sendBtn" onclick="sendMessage()">Ask</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── RESPONSE ENGINE ────────────────────────────────────────────────────────
+
+const CATCHPHRASES = [
+  "I am a man on a mission. I am relentless.",
+  "I confirm I am not AI, but I work like one.",
+  "I have returned to my hometown, and I intend to serve this community for my lifetime ahead.",
+  "I am courteous, methodical, and committed to engaging with the community.",
+  "I believe I have a great deal of things to contribute.",
+  "I am relentless. Truly relentless.",
+  "Let me be very clear on this point, because clarity is important.",
+  "I want to serve our community. I want to serve.",
+];
+
+const OPENERS = [
+  "Thank you very much for that question. I appreciate — I truly appreciate — your engagement on this matter.",
+  "That is a very, very good question. Allow me to address it comprehensively.",
+  "I am glad you have raised this. I am genuinely glad.",
+  "Thank you. Thank you for that. Let me respond to you courteously and methodically.",
+  "This is precisely the kind of question I welcome. Precisely.",
+  "I note your question, and I want you to know that I note it sincerely.",
+  "Ah. Yes. That is something I am very willing to speak about. Very willing.",
+];
+
+const CLOSERS = [
+  "And so I say to you: I am a man on a mission. I am relentless.",
+  "That is my position, and I stand by it. Courteously. But firmly.",
+  "I hope that answers your question. I hope so sincerely.",
+  "And remember: I am here to serve. I have been elected to serve, and serve I shall.",
+  "I believe that covers the matter comprehensively. Comprehensively.",
+  "I want to be transparent about this, because transparency is something I value enormously.",
+  "I confirm that my position on this remains what it is. Relentlessly so.",
+];
+
+const ECONOMIC_TANGENT = [
+  "And let me say — as I always say — that economic development, job creation, wage growth: these are the cornerstones of what I am working toward for the people of Dunedin.",
+  "Ultimately, everything comes back to economic development. Jobs. Growth. Wages. That is what Dunedin needs, and that is what I am delivering.",
+  "You know, in my years in banking — Rabobank, RBC Wealth Management, working in Singapore, working in mergers and acquisitions — I learned what drives economies. And I bring that knowledge to this council.",
+];
+
+const KAFKA_TANGENT = [
+  "It reminds me, in fact, of Kafka's The Trial — a work I hold very dear. A man is persecuted without ever being told exactly what he has done. The charges are vague. The process is opaque. I know this feeling.",
+  "As Kafka wrote in The Trial — and I have read this book, I have really read it — Josef K. wakes one morning to find himself accused. Accused! Without explanation. Without due process. I understand Josef K.",
+];
+
+function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+function maybeAdd(text, probability) {
+  return Math.random() < probability ? text : "";
+}
+
+// ── TOPIC HANDLERS ─────────────────────────────────────────────────────────
+
+const topics = [
+  {
+    keywords: ["tape", "duct", "mouth", "silenc", "protest"],
+    respond() {
+      return [
+        rand(OPENERS),
+        "The duct tape. Yes. The duct tape was — and I want to be very precise about this — a symbolic gesture. A theatrical gesture, if you will, to draw attention to what I perceived as an unfair process. An unfair process.",
+        "There are times in a democracy, and I believe deeply in democracy, where a person must make a statement. Must make it visibly. I chose to wear that tape because the process by which I was being treated was, in my view, reminiscent of Kafka. Of Kafka's Trial.",
+        rand(KAFKA_TANGENT),
+        "Do I regret it? I would say — and I say this courteously — that I acted with conviction. With total, unwavering conviction.",
+        rand(CATCHPHRASES),
+      ].filter(Boolean).join(" ");
+    }
+  },
+  {
+    keywords: ["bank", "finance", "rabobank", "rbc", "career", "singapore", "money", "wealth"],
+    respond() {
+      return [
+        rand(OPENERS),
+        "My career in banking — and it was a substantial career, I want to be very clear about that — took me to Singapore, where I worked at Rabobank International as Associate Director in Mergers and Acquisitions. Before that, Royal Bank of Canada. RBC Wealth Management.",
+        "I worked in corporate debt financing. In mergers and acquisitions. In equity fundraising. In private banking. In investment management. I have done all of these things. All of them.",
+        "And what did I learn? I learned what makes economies grow. I learned what creates jobs. I learned what drives wage growth. And I bring — and I mean I genuinely bring — that expertise to the council table.",
+        rand(ECONOMIC_TANGENT),
+        rand(CATCHPHRASES),
+      ].filter(Boolean).join(" ");
+    }
+  },
+  {
+    keywords: ["priority", "priorities", "plan", "policy", "economic", "jobs", "employment", "wages", "growth", "dunedin"],
+    respond() {
+      return [
+        rand(OPENERS),
+        "My priorities are very clear. Very clear. Economic development. Jobs. Wages. Growth. Those four things. I want Dunedin's economy to be as special as this city is.",
+        "Dunedin is my hometown. I was born here, in Dunedin. I was raised in Sydney, yes, but I returned — I returned to this beautiful city — because I believe I have something to give. Something substantial.",
+        "The people of Dunedin deserve an economy that works for them. That grows for them. That provides jobs and security and wages that people can actually live on. That is what I am fighting for. Fighting courteously, but fighting nonetheless.",
+        rand(ECONOMIC_TANGENT),
+        rand(CLOSERS),
+      ].filter(Boolean).join(" ");
+    }
+  },
+  {
+    keywords: ["eccentric", "weird", "odd", "strange", "unusual", "unique", "crazy"],
+    respond() {
+      return [
+        rand(OPENERS),
+        "Eccentric. That word — eccentric — I must say I take issue with it. Not aggressively, you understand. Courteously. But I take issue.",
+        "I would say my candidacy — and indeed my approach to council — has been unique. Unique. Not eccentric. Because eccentric can be interpreted in a very subjective way, and I do not believe subjectivity serves anyone well.",
+        "I skateboarded to deliver newspapers during my campaign. I wore duct tape to a council meeting. I read Kafka during proceedings. Are these things eccentric? Or are they simply the actions of a person who is committed? Who is passionate? Who is, dare I say it, relentless?",
+        "I leave that judgment to you. I am comfortable with who I am.",
+        rand(CATCHPHRASES),
+      ].filter(Boolean).join(" ");
+    }
+  },
+  {
+    keywords: ["kafka", "trial", "book", "read", "literature"],
+    respond() {
+      return [
+        rand(OPENERS),
+        "The Trial. By Franz Kafka. Published 1925. Posthumously, of course, because Kafka asked Max Brod to destroy his manuscripts, and Brod — wisely, I think wisely — did not.",
+        "This book speaks to me enormously. Enormously. Josef K. is a man who wakes up one morning and finds himself accused of a crime he is never told about. The bureaucracy is impenetrable. The process is opaque. The charges are unfathomable.",
+        "I brought this book to a council meeting. I read from it. Some people found this unusual. I found it necessary. Because when you are placed in a situation where the process itself seems designed to confuse and obstruct, what do you do? You name it. You name the Kafka.",
+        "I believe in naming things clearly. Even when — especially when — clarity is uncomfortable.",
+        rand(CLOSERS),
+      ].filter(Boolean).join(" ");
+    }
+  },
+  {
+    keywords: ["ai", "artificial", "robot", "chatbot", "bot", "computer", "machine"],
+    respond() {
+      return [
+        rand(OPENERS),
+        "I confirm — and I want to be very clear on this, absolutely crystal clear — I am not AI. I am not artificial intelligence. I am a human being. A person. A councillor.",
+        "However — and this is something I have said publicly — I will work like AI. I will work with the dedication, the processing capacity, the relentlessness of artificial intelligence. But I am human. Very human.",
+        "I was born in Dunedin. I have a Bachelor of Commerce from the University of New South Wales. I have worked in banking for many years. I skateboard. These are not the activities of an artificial intelligence.",
+        "Although... if I were an AI, I think I would be a very good one. Very relentless.",
+        rand(CATCHPHRASES),
+      ].filter(Boolean).join(" ");
+    }
+  },
+  {
+    keywords: ["code of conduct", "conduct", "breach", "resign", "sanction", "censure", "complaint", "investigation"],
+    respond() {
+      return [
+        rand(OPENERS),
+        "The code of conduct matter. Yes. I am aware of it. I am very aware of it. And I want to address it directly, because directness — even when it is uncomfortable — is something I value.",
+        "I have been elected by the people of Dunedin to serve. To serve them. Not to resign at the first sign of political pressure. I was elected, and I intend to honour that mandate. Fully.",
+        "The process, I will say, reminded me very much — very much indeed — of Kafka. Of The Trial. A situation where charges accumulate and the process itself becomes the punishment.",
+        rand(KAFKA_TANGENT),
+        "I remain. I serve. The people elected me, and I will not abandon them.",
+        rand(CLOSERS),
+      ].filter(Boolean).join(" ");
+    }
+  },
+  {
+    keywords: ["skateboard", "newspaper", "campaign", "election", "vote", "elected"],
+    respond() {
+      return [
+        rand(OPENERS),
+        "The skateboard! Yes. During my campaign, I delivered newspapers. By skateboard. And people found this remarkable. They found it surprising, I think, because politicians — traditional politicians — do not do this.",
+        "But I am not a traditional politician. I am a former banker who has returned to his hometown with a genuine desire to serve. A genuine, deep, heartfelt desire.",
+        "I knocked on doors. I talked to people. Real people. I skateboarded through the streets of Dunedin delivering information. Because engagement — community engagement — is everything to me.",
+        "And the people responded. They elected me. They elected me to this council, and I am grateful. I am truly, deeply grateful.",
+        rand(ECONOMIC_TANGENT),
+        rand(CATCHPHRASES),
+      ].filter(Boolean).join(" ");
+    }
+  },
+  {
+    keywords: ["english", "comprehension", "language", "colleague", "council member", "fellow"],
+    respond() {
+      return [
+        rand(OPENERS),
+        "I always — always — encourage clear communication. Clear, precise communication. If there is ever a misunderstanding, I think it is important to address it head-on. Courteously. But head-on.",
+        "I believe that when people engage in dialogue, they must engage honestly and with precision. Precision matters. Words matter. Comprehension matters. And I will always advocate for clarity.",
+        "I will say no more on that subject, other than to say: clarity, always clarity.",
+        rand(CLOSERS),
+      ].filter(Boolean).join(" ");
+    }
+  },
+  {
+    keywords: ["hello", "hi", "hey", "greet", "good morning", "good afternoon", "good day"],
+    respond() {
+      return [
+        "Good day to you! And what a day it is. I am Councillor Benedict Ong — a man who has returned to his hometown of Dunedin with a mission. With a genuine mission.",
+        "I am very, very pleased to speak with you. Very pleased. I believe in community engagement. I believe in dialogue. I believe that when people talk — really talk — good things happen for everyone.",
+        rand(ECONOMIC_TANGENT),
+        rand(CATCHPHRASES),
+      ].filter(Boolean).join(" ");
+    }
+  },
+];
+
+const defaultResponse = (input) => {
+  const fragments = [
+    rand(OPENERS),
+    `The matter of "${input.slice(0, 40)}${input.length > 40 ? '...' : ''}" — and I have thought about this, I have really thought about it — is something I take very seriously. Very seriously indeed.`,
+    "You know, when I was working in Singapore, in Rabobank, in RBC Wealth Management, I encountered many complex questions. Many. And the answer, invariably, came down to this: clarity, commitment, and community.",
+    "Clarity about what the question actually is. Commitment to finding the answer. And community — always community — as the ultimate purpose.",
+    maybeAdd(rand(ECONOMIC_TANGENT), 0.6),
+    maybeAdd(rand(KAFKA_TANGENT), 0.3),
+    "I hope that addresses your question. I hope it comprehensively addresses it.",
+    rand(CLOSERS),
+  ].filter(Boolean).join(" ");
+  return fragments;
+};
+
+function generateResponse(input) {
+  const lower = input.toLowerCase();
+  for (const topic of topics) {
+    if (topic.keywords.some(k => lower.includes(k))) {
+      return topic.respond();
+    }
+  }
+  return defaultResponse(input);
+}
+
+// ── CHAT LOGIC ─────────────────────────────────────────────────────────────
+
+function addMessage(text, sender) {
+  const box = document.getElementById("chatBox");
+  const msg = document.createElement("div");
+  msg.className = `message ${sender}`;
+
+  const label = document.createElement("div");
+  label.className = "msg-label";
+  label.textContent = sender === "user" ? "You" : "Cr. Benedict Ong";
+
+  const bubble = document.createElement("div");
+  bubble.className = "bubble";
+  bubble.textContent = text;
+
+  msg.appendChild(label);
+  msg.appendChild(bubble);
+  box.appendChild(msg);
+  box.scrollTop = box.scrollHeight;
+}
+
+function showTyping() {
+  const box = document.getElementById("chatBox");
+  const indicator = document.createElement("div");
+  indicator.className = "message benedict";
+  indicator.id = "typingIndicator";
+  const label = document.createElement("div");
+  label.className = "msg-label";
+  label.textContent = "Cr. Benedict Ong";
+  const dots = document.createElement("div");
+  dots.className = "typing-indicator";
+  dots.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+  indicator.appendChild(label);
+  indicator.appendChild(dots);
+  box.appendChild(indicator);
+  box.scrollTop = box.scrollHeight;
+}
+
+function hideTyping() {
+  const el = document.getElementById("typingIndicator");
+  if (el) el.remove();
+}
+
+function setSvgTalking(on) {
+  const svg = document.getElementById("benedictSvg");
+  const badge = document.querySelector(".status-badge");
+  if (on) {
+    svg.classList.add("talking");
+    badge.textContent = "● Responding (at length)...";
+    badge.style.color = "#f5d76e";
+    badge.style.borderColor = "rgba(245,215,110,0.5)";
+    badge.style.background = "rgba(245,215,110,0.12)";
+  } else {
+    svg.classList.remove("talking");
+    badge.textContent = "● Ready to respond (at length)";
+    badge.style.color = "#7fc97f";
+    badge.style.borderColor = "rgba(127,201,127,0.4)";
+    badge.style.background = "rgba(127,201,127,0.15)";
+  }
+}
+
+// Cancellation token for the current response
+let currentCancel = null;
+
+function cancelCurrent() {
+  if (currentCancel) {
+    currentCancel();
+    currentCancel = null;
+  }
+}
+
+function typeMessage(text, onDone) {
+  const box = document.getElementById("chatBox");
+  const msg = document.createElement("div");
+  msg.className = "message benedict";
+
+  const label = document.createElement("div");
+  label.className = "msg-label";
+  label.textContent = "Cr. Benedict Ong";
+
+  const bubble = document.createElement("div");
+  bubble.className = "bubble";
+
+  const cursor = document.createElement("span");
+  cursor.id = "typeCursor";
+  cursor.textContent = "▌";
+  cursor.style.cssText = "animation: cursorBlink 0.7s steps(1) infinite; color: #f5d76e;";
+
+  msg.appendChild(label);
+  msg.appendChild(bubble);
+  box.appendChild(msg);
+
+  setSvgTalking(true);
+
+  let cancelled = false;
+  let timeoutId = null;
+
+  currentCancel = () => {
+    cancelled = true;
+    if (timeoutId) clearTimeout(timeoutId);
+    msg.remove(); // remove the incomplete bubble entirely
+    setSvgTalking(false);
+  };
+
+  let i = 0;
+  function typeNext() {
+    if (cancelled) return;
+    if (i < text.length) {
+      bubble.textContent = text.slice(0, i + 1);
+      bubble.appendChild(cursor);
+      box.scrollTop = box.scrollHeight;
+      i++;
+      const ch = text[i - 1];
+      let delay = 18 + Math.random() * 12;
+      if (ch === '.' || ch === '?' || ch === '!') delay = 160 + Math.random() * 120;
+      else if (ch === ',') delay = 80 + Math.random() * 60;
+      else if (ch === ' ') delay = 22 + Math.random() * 14;
+      timeoutId = setTimeout(typeNext, delay);
+    } else {
+      cursor.remove();
+      currentCancel = null;
+      setSvgTalking(false);
+      if (onDone) onDone();
+    }
+  }
+  typeNext();
+}
+
+function sendMessage() {
+  const input = document.getElementById("userInput");
+  const btn = document.getElementById("sendBtn");
+  const text = input.value.trim();
+  if (!text) return;
+
+  // Interrupt any in-progress response
+  cancelCurrent();
+  hideTyping();
+
+  addMessage(text, "user");
+  input.value = "";
+
+  showTyping();
+
+  // Thoughtful pause before he starts — he never answers quickly
+  let active = true;
+  let pauseId = null;
+  const delay = 1800 + Math.random() * 1400;
+
+  currentCancel = () => {
+    active = false;
+    clearTimeout(pauseId);
+    hideTyping();
+    currentCancel = null;
+  };
+
+  pauseId = setTimeout(() => {
+    if (!active) return;
+    currentCancel = null;
+    hideTyping();
+    const response = generateResponse(text);
+    typeMessage(response, () => {
+      btn.disabled = false;
+      input.disabled = false;
+      input.focus();
+    });
+  }, delay);
+}
+
+function sendSuggestion(btn) {
+  document.getElementById("userInput").value = btn.textContent;
+  sendMessage();
+}
+
+// Type out the opening greeting on load
+window.addEventListener("DOMContentLoaded", () => {
+  const greeting = "Good day to you. I am very pleased, and I mean truly very pleased, to welcome you to this dialogue. I am Councillor Benedict Ong — a man on a mission. A man who is relentless. I have returned to my hometown of Dunedin with a great deal of things to contribute to our community, and I intend to serve this community for my lifetime ahead. Please, ask me anything. I am here. I am ready. I am relentless.";
+  const btn = document.getElementById("sendBtn");
+  const input = document.getElementById("userInput");
+  btn.disabled = true;
+  input.disabled = true;
+  setTimeout(() => {
+    typeMessage(greeting, () => {
+      btn.disabled = false;
+      input.disabled = false;
+      input.focus();
+    });
+  }, 600);
+});
+</script>
+</body>
+</html>
