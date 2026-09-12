@@ -468,13 +468,17 @@
     <div class="chat-box" id="chatBox"></div>
 
     <div class="suggestions" id="suggestions">
+      <button class="suggestion-btn" onclick="sendSuggestion(this)">Why were you trespassed from the University of Otago?</button>
+      <button class="suggestion-btn" onclick="sendSuggestion(this)">Why were you asked to leave the amalgamation meeting?</button>
+      <button class="suggestion-btn" onclick="sendSuggestion(this)">Why did you get kicked out of two events in one week?</button>
+      <button class="suggestion-btn" onclick="sendSuggestion(this)">What's the deal with the Deputy Mayor's complaint?</button>
+      <button class="suggestion-btn" onclick="sendSuggestion(this)">What happened with the code of conduct?</button>
       <button class="suggestion-btn" onclick="sendSuggestion(this)">Why did you put tape on your mouth?</button>
       <button class="suggestion-btn" onclick="sendSuggestion(this)">Tell me about your banking career</button>
       <button class="suggestion-btn" onclick="sendSuggestion(this)">What are your priorities for Dunedin?</button>
       <button class="suggestion-btn" onclick="sendSuggestion(this)">Are you eccentric?</button>
       <button class="suggestion-btn" onclick="sendSuggestion(this)">What do you think about The Trial by Kafka?</button>
       <button class="suggestion-btn" onclick="sendSuggestion(this)">Are you AI?</button>
-      <button class="suggestion-btn" onclick="sendSuggestion(this)">What happened with the code of conduct?</button>
     </div>
 
     <div class="input-row">
@@ -602,6 +606,62 @@ const topics = [
         "This book speaks to me enormously. Enormously. Josef K. is a man who wakes up one morning and finds himself accused of a crime he is never told about. The bureaucracy is impenetrable. The process is opaque. The charges are unfathomable.",
         "I brought this book to a council meeting. I read from it. Some people found this unusual. I found it necessary. Because when you are placed in a situation where the process itself seems designed to confuse and obstruct, what do you do? You name it. You name the Kafka.",
         "I believe in naming things clearly. Even when — especially when — clarity is uncomfortable.",
+        rand(CLOSERS),
+      ].filter(Boolean).join(" ");
+    }
+  },
+  {
+    keywords: ["amalgamation", "unitary", "queenstown", "asset valuation", "marriage", "mayor barker", "main topic"],
+    respond() {
+      return [
+        rand(OPENERS),
+        "The amalgamation discussion. A significant matter. A truly significant matter for the future of this region, and I asked — I merely asked — searching questions about asset valuations. Searching questions.",
+        "I used a marriage metaphor, yes. Because a council amalgamation is, in its essence, exactly like a marriage. You do not enter into it without understanding what each party brings to the union. This is not a controversial analogy. It is simply accurate.",
+        "When the Mayor asked me to leave, I informed her, quite plainly, that I was not leaving unless she wanted me to be the main topic tomorrow in the news. I stand by that statement. I stand by it fully.",
+        "I understand a two-unitary model with Queenstown Lakes is now being developed. I will be watching this process closely. Very closely.",
+        rand(KAFKA_TANGENT),
+        rand(CATCHPHRASES),
+      ].filter(Boolean).join(" ");
+    }
+  },
+  {
+    keywords: ["kicked out", "removed", "asked to leave", "protest", "debate", "escorted", "security", "big hairy", "student"],
+    respond() {
+      return [
+        rand(OPENERS),
+        "You are referring, I imagine, to the student protest and the health debate. Two events. One week. And in both cases, I was denied the opportunity to speak.",
+        "At the protest, I stood to make my voice heard when I was not selected to speak. The organiser called this 'disorderly'. I call it engagement. Direct, unfiltered engagement with the community I serve.",
+        "At the health debate, I had paid twenty dollars — twenty of my own dollars — to attend, and when I rose to ask a question outside of the designated time, security was called. Security. For a question.",
+        "I believe, and I say this without bitterness, that certain organisers simply do not like me, and so they find procedural reasons to silence me. It is, I will say it again, very reminiscent of Kafka.",
+        rand(KAFKA_TANGENT),
+        rand(CLOSERS),
+      ].filter(Boolean).join(" ");
+    }
+  },
+  {
+    keywords: ["cherry lucas", "deputy mayor", "sandy graham", "chief executive", "ceo", "confidential", "facebook post", "third complaint", "coercion"],
+    respond() {
+      return [
+        rand(OPENERS),
+        "The third complaint. Yes. Laid by the Deputy Mayor, Cherry Lucas, who I believe — and I say this courteously — is desirous to roll over to the highest of authority of the Mayoralty.",
+        "I posted to Facebook. I referenced matters from a confidential meeting. The Mayor asked me to remove it. I did not remove it, because I believed — and still believe — that the people of Dunedin deserve to know how their council truly operates.",
+        "As for the Chief Executive — I have said, and I stand by saying, that she acts under the strict instructions, or strict coercion, of the Mayor. These are not idle words. These are observations. Careful observations.",
+        "I was, I will note, suspended from all committees and subcommittees for nine months following an earlier matter. Nine months. I continue to serve regardless, because suspension from a committee is not suspension from conviction.",
+        rand(KAFKA_TANGENT),
+        rand(CLOSERS),
+      ].filter(Boolean).join(" ");
+    }
+  },
+  {
+    keywords: ["trespass", "otago university", "ousa", "campus", "ubar", "physical proximity", "banned from"],
+    respond() {
+      return [
+        rand(OPENERS),
+        "The trespass notice. Two years, from all University of Otago grounds and premises. I want to say, very plainly, that I regard these allegations as false and malicious attacks. Politically motivated attacks.",
+        "My visits to Ubar — and yes, I have visited Ubar — are well documented. Well documented on my own social media accounts. I was there. Student supporters requested photographs with me. This is community engagement, not misconduct.",
+        "As for the deadline the university gave me to respond — I found it, frankly, inappropriate. I am an elected councillor. I represent the people of this city. I do not believe I was afforded the process that role deserves.",
+        "The process, again, reminds me of Kafka. Of The Trial. Allegations without a proper accounting, and a punishment — a two-year exile from my own alma mater — handed down regardless.",
+        rand(KAFKA_TANGENT),
         rand(CLOSERS),
       ].filter(Boolean).join(" ");
     }
